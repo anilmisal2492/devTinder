@@ -1,24 +1,22 @@
 const express = require("express");
 const app = express();
+const {adminAuth,userAuth} = require("./middlewares/auth");
 
-app.use("/user", (req, resp, next) => {
-  console.log("user api called");
-  // resp.send("user api response");
-  next();
+app.use("/admin", adminAuth);
+app.use("/user", userAuth);
+
+app.get("/user", (req, res) => {
+  console.log("User Page Accessed");
+  res.send("User Page Accessed");
 });
-app.use("/user", (req, resp, next) => {
-  console.log("admin api called");
-  // resp.send("admin api response");
-  next();
+app.get("/admin", (req, res) => {
+  console.log("Admin Page Accessed");
+  res.send("Admin Page Accessed");
 });
-app.use("/user", (req, resp, next) => {
-  console.log("guest api called");
-  // resp.send("guest api response");
-  next();
-});
-app.use((req, resp, next) => {
-  console.log("all api called");
-  resp.send("all api response");
+
+app.post("/login", (req, res) => {
+  console.log("Login Page Accessed");
+  res.send("Login Page Accessed");
 });
 
 app.listen(3000, () => {
