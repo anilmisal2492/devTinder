@@ -12,7 +12,9 @@ const userSchema = new mongoose.Schema(
       min: 18,
       max: 100,
     },
-    gender: String,
+    gender: {
+      type: String,
+    },
     email: {
       type: String,
       required: true,
@@ -24,14 +26,17 @@ const userSchema = new mongoose.Schema(
           }
         },
       },
-      password: {
-        type: String,
-        required: true,
-      },
-      location: {
-        type: String,
-      },
-      skills: [String],
+    },
+    password: {
+      type: String,
+      required: true,
+    },
+    location: {
+      type: String,
+    },
+    skills: {
+      type: [String],
+      default: [],
     },
   },
   {
