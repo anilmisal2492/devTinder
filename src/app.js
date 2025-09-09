@@ -18,6 +18,29 @@ app.post("/login", async (req, res) => {
   }
 });
 
+// Fetch all users
+app.get("/feed", async (req, res) => {
+  try {
+    const users = await User.find(); // ✅ fetch all users
+    res.send(users); // ✅ send users as JSON response
+  } catch (err) {
+    res.status(500).send("Failed to fetch users");
+  }
+});
+// Fetch user by email
+app.get("/user", async (req, res) => {
+  try {
+    const email = req.body.email; // ✅ get email from request body
+    const user = await User.findOne({ email: email }); // ✅ find user by email
+    if (!email) {
+      return res.status(400).send("Email is required");
+    } else {
+      res.send(user);
+    }
+  } catch (err) {
+    res.status(500).send("Failed to fetch user");
+  }
+});
 connectDb()
   .then(() => {
     console.log("Database connected");
