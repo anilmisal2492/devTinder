@@ -41,6 +41,28 @@ app.get("/user", async (req, res) => {
     res.status(500).send("Failed to fetch user");
   }
 });
+
+// Delete user by userId
+app.delete("/user", async (req, res) => {
+  const userId = req.body.userId; // ✅ get userId from request body
+  try {
+    await User.findByIdAndDelete(userId); // ✅ delete user by userId
+    res.send("User deleted successfully");
+  } catch (err) {
+    res.status(500).send("Failed to delete user");
+  }
+});
+// Update user by userId
+app.patch("/user", async (req, res) => {
+  const userId = req.body.userId; // ✅ get userId from request body
+  const updateData = req.body; // ✅ get update data from request body
+  try {
+    await User.findByIdAndUpdate(userId, updateData); // ✅ update user by userId
+    res.send("User updated successfully");
+  } catch (err) {
+    res.status(500).send("Failed to update user");
+  }
+});
 connectDb()
   .then(() => {
     console.log("Database connected");
