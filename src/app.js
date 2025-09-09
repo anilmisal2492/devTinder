@@ -3,18 +3,12 @@ const { connectDb } = require("./config/database"); // ✅ destructure correctly
 const User = require("./models/user"); // ✅ import the User model
 const app = express();
 const PORT = 3000;
+app.use(express.json());
 
 app.post("/login", async (req, res) => {
   try {
-    const user = new User({
-      name: "Virat",
-      age: 23,
-      gender: "male",
-      email: "test@email.com",
-      password: "12345",
-      location: "Pune",
-      confirmPassword: "12345",
-    });
+    console.log("Request Body:", req.body); // ✅ log the request body
+    const user = new User(req.body); // ✅ create a new User instance
 
     await user.save(); // ✅ save is async
     res.send("User created successfully !!");
