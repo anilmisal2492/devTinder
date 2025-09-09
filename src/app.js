@@ -1,24 +1,37 @@
 const express = require("express");
+const { connectDb } = require("./config/database"); // ✅ destructure correctly
+const User = require("./models/user"); // ✅ import the User model
 const app = express();
-const {adminAuth,userAuth} = require("./middlewares/auth");
+const PORT = 3000;
 
-app.use("/admin", adminAuth);
-app.use("/user", userAuth);
+app.post("/login", async (req, res) => {
+  try {
+    const user = new User({
+      name: "Virat",
+      age: 23,
+      gender: "male",
+      email: "test@email.com",
+      password: "12345",
+      location: "Pune",
+      confirmPassword: "12345",
+    });
 
-app.get("/user", (req, res) => {
-  console.log("User Page Accessed");
-  res.send("User Page Accessed");
-});
-app.get("/admin", (req, res) => {
-  console.log("Admin Page Accessed");
-  res.send("Admin Page Accessed");
-});
-
-app.post("/login", (req, res) => {
-  console.log("Login Page Accessed");
-  res.send("Login Page Accessed");
+    await user.save(); // ✅ save is async
+    res.send("User created successfully !!");
+  } catch (err) {
+    console.error("Error creating user:", err);
+    res.status(500).send("Failed to create user");
+  }
 });
 
-app.listen(3000, () => {
-  console.log("server started at port 3000");
-});
+connectDb()
+  .then(() => {
+    console.log("Database connected");
+
+    app.listen(PORT, () => {
+      console.log(`🚀 Server started at port ${PORT}`);
+    });
+  })
+  .catch((err) => {
+    console.error("❌ Failed to connect to DB:", err);
+  });
