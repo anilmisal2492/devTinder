@@ -53,10 +53,20 @@ app.delete("/user", async (req, res) => {
   }
 });
 // Update user by userId
-app.patch("/user", async (req, res) => {
-  const userId = req.body.userId; // ✅ get userId from request body
+app.patch("/user/:userId", async (req, res) => {
+  const userId = req.params?.userId; // ✅ get userId from request body
   const updateData = req.body; // ✅ get update data from request body
+  const ALLOWED_UPDATES = ["name", "age","skills","location", ]; // ✅ define allowed fields to update
   try {
+    const isValidOperation = Object.keys(updateData).every((key) =>
+      ALLOWED_UPDATES.includes(key)
+    );
+    if (!isValidOperation) {
+      return res.status(400).send("Invalid updates!");
+    }
+    if(updateData.skills > 10){
+      return res.status(400).send("Skills should be less than 10");
+    }
     await User.findByIdAndUpdate(userId, updateData); // ✅ update user by userId
     res.send("User updated successfully");
   } catch (err) {
