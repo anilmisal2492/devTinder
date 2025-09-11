@@ -3,9 +3,12 @@ const { connectDb } = require("./config/database"); // ✅ destructure correctly
 const User = require("./models/user"); // ✅ import the User model
 const { validationData } = require("./utils/utils"); // ✅ import validation function
 const bcrypt = require("bcrypt"); // ✅ import bcrypt for password hashing
+const cookieParser = require('cookie-parser'); // Import cookie-parser middleware
+const jwt = require('jsonwebtoken'); // Import jsonwebtoken for token generation
 const app = express();
 const PORT = 3000;
 app.use(express.json());
+app.use(cookieParser()); // Use cookie-parser middleware
 
 app.post("/signup", async (req, res) => {
   try {
@@ -33,6 +36,55 @@ app.post("/signup", async (req, res) => {
   }
 });
 
+// login API
+app.post("/login", async (req, res) => {
+  try {
+    const { email, password } = req.body; // ✅ get email and password from request body
+    const user = await User.findOne({ email: email }); // ✅ find user by email
+    if (!user) {
+      return res.status(400).send("Invalid email or password");
+    }
+    const isPasswordMatch = await bcrypt.compare(password, user.password); // ✅ compare passwords
+    if (!isPasswordMatch) {
+      return res.status(400).send("Invalid email or password");
+    }
+
+    // Generate a simple token (in real applications, use JWT or similar)
+    // ✅ Create JWT token
+    const token = jwt.sign(
+      { userId: user._id, email: user.email }, // payload
+      "Namaste@369", // 🔑 secret key (keep in env variable!)
+      { expiresIn: "1h" } // token expires in 1 hour
+    ); // ✅ generate a simple token
+        // send a cookie
+    res.cookie('token', token);
+    res.send("Login successful");
+
+    
+  } catch (err) {
+    res.status(500).send("ERROR logging in" + err.message);
+  }
+});
+// Profile API to get user details
+app.get("/profile", async (req, res) => {
+  try {
+    const token = req.cookies.token; // Get token from cookies
+    if (!token) {
+      return res.status(401).send("Access denied. No token provided.");
+    }
+    // Verify token
+      const decoded = jwt.verify(token, "Namaste@369");
+      const userId = decoded.userId;  // Get userId from decoded token
+      const user = await User.findById(userId); // Fetch user details excluding password
+      if (!user) {
+        return res.status(404).send("User not found");
+      } else {
+        res.send(user);
+      }
+    }
+    catch (err) {
+      res.status(500).send("ERROR fetching profile" + err.message);
+    } });
 // Fetch all users
 app.get("/feed", async (req, res) => {
   try {
